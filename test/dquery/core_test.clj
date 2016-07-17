@@ -5,11 +5,11 @@
 ;;define two entities
 (defmethod entity-of :test/entity1 [_] {:a 1, :b 2, :c {:x 10, :y 11}})
 (defmethod entity-of :test/entity2 [_] {:ax 10, :bx 20, :cx {:xx 100, :yx 110}, :d [{:x 20, :y 30}, {:x 30, :y 40}]})
-
+(defmethod entity-of :test/entity3 [_] [{:x 20, :y 30}, {:x 30, :y 40}])
 
 
 (deftest one-entity
-  (is (= {:a 1, :b 2, :c {:x 10, :y 11}} (query :test/entity1))))
+  (is (= {:test/entity1 {:a 1, :b 2, :c {:x 10, :y 11}}} (query :test/entity1))))
 
 (deftest one-entity-of-many
   (is (= {:test/entity1 {:a 1, :b 2, :c {:x 10, :y 11}}} 
@@ -29,17 +29,27 @@
          (query [{:test/entity1 [{:c [:y]}]}]))))
 
 (deftest one-entity-join-to-list
-  (is (= {:test/entity1 {:d [{:x 30}]}} 
-         (query [{:test/entity1 [{:d [:x]}]}]))))
+  (is (= {:test/entity2 {:d [{:x 20}, {:x 30}]}} 
+         (query [{:test/entity2 [{:d [:x]}]}]))))
 
 (deftest two-entities-two-joins
   (is (= {:test/entity1 {:a 1}, :test/entity2 {:bx 20}} 
          (query [{:test/entity1 [:a]} {:test/entity2 [:bx]}]))))
 
 (deftest one-entity-zero-joins
-  (is (= [{:test/entity1 {}}] 
-         (query [{:test/entity1 []}]))))
-  ;(is (= [{:test/entity1 {:a 1, :b 2, :c [:x 10, :y 11]}}] (query [{:test/entity1 [*]}])))
+  #_(is (= [{:test/entity1 {}}] 
+          (query [{:test/entity1 []}]))))
+
+
+(deftest one-list-entity
+  (is (= {:test/entity3 [{:x 20, :y 30} {:x 30, :y 40}]} 
+         (query :test/entity3))))
+
+(deftest one-list-entity-one-join
+  (is (= {:test/entity3 [{:x 20} {:x 30}]} 
+         (query [{:test/entity3 [:x]}]))))
+
+;(is (= [{:test/entity1 {:a 1, :b 2, :c [:x 10, :y 11]}}] (query [{:test/entity1 [*]}])))
   
 
 
