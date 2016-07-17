@@ -6,9 +6,6 @@
   (query-impl [expr context]))
 
 
-
-(defmethod entity-of :test/property [_] {:a 1, :b 2, :c {:x 10, :y 11}})
-
 (extend-protocol IDQuery
   clojure.lang.IPersistentVector
   (query-impl [expr context] (reduce merge (map (fn [e] (query-impl e context))  expr)))
